@@ -1,14 +1,6 @@
 <?php
 
-use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\AdministrativoController;
-use App\Http\Controllers\BotWhatsappController;
-use App\Http\Controllers\CursoController;
-use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\MesaController;
-use App\Http\Controllers\ProduccionController;
-use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\ProductoOfertaController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\userController;
 use Illuminate\Support\Facades\Route;
