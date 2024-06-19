@@ -4,8 +4,8 @@ services:
 
   mysql:
     image: mysql:8.0.13
-    container_name: mysql-pedidos
-    hostname: mysql-pedidos
+    container_name: mysql-billar
+    hostname: mysql-billar
     restart: always
     command: --default-authentication-plugin=mysql_native_password
     environment:
@@ -16,11 +16,11 @@ services:
     volumes:
       - ./mysql_data:/var/lib/mysql
     networks:
-      - pedidos-network
+      - billar-network
 
   # phpmyadmin:
   #   image: phpmyadmin/phpmyadmin
-  #   container_name: phpmyadmin-wordpress
+  #   container_name: phpmyadmin-billar
   #   hostname: phpmyadmin
   #   restart: always
   #   ports:
@@ -31,8 +31,8 @@ services:
   #   depends_on:
   #     - mysql
   #   networks:
-  #     - wordpress-network
+  #     - billar-network
 
 networks:
-  pedidos-network:
+  billar-network:
     external: true

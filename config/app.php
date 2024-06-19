@@ -56,8 +56,6 @@ return [
 
     'asset_url' => env('ASSET_URL', null),
 
-    'BOT_HOST' => env('BOT_HOST', "http://localhost"),
-
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
