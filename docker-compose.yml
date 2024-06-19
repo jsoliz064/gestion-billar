@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: gestion-pedidos
+    working_dir: /var/www/html/
+    restart: always
+    container_name: gestion-pedidos
+    hostname: gestion-pedidos
+    ports:
+      - "${GESTION_PORT}:80"
+    volumes:
+      - ./:/var/www/html/
+    networks:
+      - pedidos-network
+
+networks:
+  pedidos-network:
+    external: true
