@@ -9,11 +9,10 @@
 ```
 ASSET_URL=/public
 
-BOT_HOST=http://bot-pedidos:3000
 GESTION_PORT=8000
 
 DB_CONNECTION=mysql
-DB_HOST=mysql-pedidos
+DB_HOST=mysql-billar
 DB_PORT=3306
 DB_DATABASE=
 DB_USERNAME=root
@@ -37,9 +36,9 @@ DB_PASSWORD=
 ```
     composer install
     
-    docker exec gestion-pedidos chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+    docker exec gestion-billar chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-    docker exec gestion-pedidos chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+    docker exec gestion-billar chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
     php artisan optimize
 ```
