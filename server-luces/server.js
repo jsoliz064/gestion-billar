@@ -1,9 +1,8 @@
 const express = require("express");
 const axios = require("axios");
 const cron = require("node-cron");
-
 const app = express();
-const port = 3000;
+const port = 4000;
 
 app.use(express.json());
 
@@ -23,6 +22,16 @@ const sendSonoffRequest = async (ip, port, deviceid, outlet, action) => {
     } catch (error) {
         console.error("Error al llamar a la API del Sonoff:", error.message);
         throw new Error("Error al llamar a la API del Sonoff");
+    }
+};
+
+const terminarPedido = async (id) => {
+    const url = `http://127.0.0.1:8000/api/pedidos/terminar/${id}`;
+    try {
+        const response = await axios.post(url);
+        return response.data;
+    } catch (error) {
+        console.error("Error al llamar a la API del Sonoff:", error.message);
     }
 };
 
@@ -50,7 +59,7 @@ app.post("/switch", async (req, res) => {
 
 // Ruta para programar una acción
 app.post("/schedule-switch", (req, res) => {
-    const { ip, port, deviceid, outlet, action, datetime } = req.body;
+    const { ip, port, deviceid, outlet, action, datetime , pedido_id} = req.body;
 
     if (
         !ip ||
@@ -77,7 +86,7 @@ app.post("/schedule-switch", (req, res) => {
         cronTime,
         async () => {
             try {
-                await sendSonoffRequest(ip, port, deviceid, outlet, action);
+                await terminarPedido(pedido_id);
                 console.log(`Acción ejecutada: ${action} en ${datetime}`);
             } catch (error) {
                 console.error(
