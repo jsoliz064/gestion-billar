@@ -3,90 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ExceptionArray;
-use App\Models\Cliente;
 use App\Models\Pedido;
-use App\Models\PedidoDetalle;
-use App\Models\Producto;
 use App\Traits\ResponseTrait;
 use App\Traits\ReverseGeocodeTrait;
+use App\Traits\ServerTrait;
 use App\Traits\ValidateRequestTrait;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 
 class PedidoController extends Controller
 {
-    use ResponseTrait, ValidateRequestTrait, ReverseGeocodeTrait;
-
-    public function create(Request $request)
+    use ServerTrait;
+    public function index()
     {
-        try {
-            $this->ValidatorRequest($request->all(), [
-                'telefono' => 'required|numeric|digits:11',
-                'fecha_entrega' => 'required|date|date_format:Y-m-d',
-                'descripcion' => 'nullable|string',
-                'latitud' => 'required|numeric',
-                'longitud' => 'required|numeric',
-                'detalles' => 'required|array'
-            ]);
-
-            $telefono = $request->telefono;
-            $client = Cliente::where('telefono', $telefono)->first();
-            if ($client == null) {
-                throw new ExceptionArray("Cliente no registrado");
-            }
-
-            $pedido = DB::transaction(function () use ($request, $client) {
-                $pedido = Pedido::create([
-                    'fecha_entrega' => $request->fecha_entrega,
-                    'descripcion' => $request->descripcion,
-                    'latitud' => $request->latitud,
-                    'longitud' => $request->longitud,
-                    'cliente_id' => $client->id
-                ]);
-                $total = 0;
-                foreach ($request->detalles as $detalle) {
-
-                    $this->ValidatorRequest($detalle, [
-                        'id' => 'required|numeric',
-                        'cantidad' => 'required|numeric',
-                    ], "Error de parametros en detalles");
-
-                    $producto = Producto::find($detalle['id']);
-                    if ($producto) {
-                        $subtotal = $producto->precio * $detalle['cantidad'];
-                        $total = $total + $subtotal;
-                        PedidoDetalle::create([
-                            'cantidad' => $detalle['cantidad'],
-                            'precio' => $producto->precio,
-                            'subtotal' => $subtotal,
-                            'producto_id' => $producto->id,
-                            'pedido_id' => $pedido->id
-                        ]);
-                    }
-                }
-
-                $pedido->update([
-                    'subtotal' => $total,
-                    'total' => $total,
-                ]);
-
-                $client->addAddress($request->latitud, $request->longitud);
-
-                return $pedido;
-            });
-
-            return response()->json(['message' => 'Pedido registrado exitosamente', 'pedido' => $pedido], 200);
-        } catch (ExceptionArray $th) {
-            return $this->ResponseThrow($th);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'message' => $th->getMessage()
-            ], 500);
-        }
+        return view('cruds.pedido.index');
     }
-
-    public function switch($status)
+    public function switch2($status)
     {
         // return [];
         try {
@@ -123,25 +54,28 @@ class PedidoController extends Controller
         }
     }
 
-    public function reverseGeocode(Request $request)
+    public function terminarPedido($pedido_id)
     {
         try {
-            $this->ValidatorRequest($request->all(), [
-                'lat' => 'required|numeric',
-                'lng' => 'required|numeric',
-            ]);
-
-            $lat = $request->lat;
-            $lng = $request->lng;
-
-            $data = $this->getAddress($lat, $lng);
-            return response()->json(['address' => $data], 200);
-        } catch (ExceptionArray $th) {
-            return $this->ResponseThrow($th);
+            $pedido = Pedido::find($pedido_id);
+            if ($pedido == null) {
+                return response()->json(['message' => "Pedido {$pedido_id} no encontrado"], 400);
+            }
+            if ($pedido->estado == "terminado") {
+                return response()->json(['message' => "Pedido {$pedido_id} ya se encuentra terminado"], 400);
+            }
+            $pedido->estado = "terminado";
+            $total = $pedido->cantidad_horas * $pedido->Mesa->precio;
+            $pedido->total = $total;
+            $pedido->save();
+            try {
+                $this->switch($pedido->Mesa, "off");
+            } catch (\Throwable $th) {
+                return response()->json(['message' => "Pedido {$pedido_id} terminado, pero hubo un error al apagar la luz, mesa: {$pedido->Mesa->nombre}"], 200);
+            }
+            return response()->json(['message' => "Pedido {$pedido_id} terminado"], 200);
         } catch (\Throwable $th) {
-            return response()->json([
-                'message' => $th->getMessage()
-            ], 500);
+            return response()->json(['message' => "Error al terminar el pedido"], 500);
         }
     }
 }

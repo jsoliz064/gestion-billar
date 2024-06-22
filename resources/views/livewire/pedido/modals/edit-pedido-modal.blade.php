@@ -23,8 +23,17 @@
                                     </div>
 
                                     <div class="col-12 my-2">
-                                        <label for="">Cant. Horas</label>
+                                        <label for="">Cant. Horas:</label>
                                         <input type="text" value="{{ $pedido->cantidad_horas }}" readonly="true"
+                                            class="form-control">
+                                    </div>
+
+                                    <div class="col-12 my-2">
+                                        <label for="">Total Bs:</label>
+                                        @php
+                                            $total = $pedido->cantidad_horas * $pedido->Mesa->precio;
+                                        @endphp
+                                        <input type="text" value="{{ $total }}" readonly="true"
                                             class="form-control">
                                     </div>
                                 @else
@@ -45,15 +54,30 @@
                                             <small class="text-danger">campo requerido</small>
                                         @enderror
                                     </div>
+
+                                    <div class="col-12 my-2">
+                                        <label for="">Total Bs:</label>
+                                        @php
+                                            $total = $pedidoUpdate['cantidad_horas'] * $pedido->Mesa->precio;
+                                        @endphp
+                                        <input type="text" value="{{ $total }}" readonly="true"
+                                            class="form-control">
+                                    </div>
                                 @endif
 
+                                @if ($error)
+                                    <small class="text-danger">{{ $error }}</small>
+                                @endif
 
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" wire:click="cancelar()">Cancelar</button>
-                            <button type="button" class="btn btn-primary"
-                                wire:click="terminarPedido()">Terminar</button>
+                            <button type="button" class="btn btn-primary" wire:click="terminarPedido()"
+                                wire:loading.attr='disabled'>Terminar <div wire:loading
+                                    class="spinner-border spinner-border-sm" role="status"
+                                    wire:target='terminarPedido'>
+                                    <span class="sr-only">Loading...</span></button>
                         </div>
                     </div>
                 </div>

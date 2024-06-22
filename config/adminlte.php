@@ -316,22 +316,27 @@ return [
         ],
         ['header' => 'GESTION'],
         [
-            'text' => 'Pedidos',
+            'text' => 'Control de Luces',
             'route'  => 'home',
             'icon' => 'fas fa-money-bill-wave',
         ],
         [
-            'text' => 'USUARIOS',
+            'text' => 'Historial de Pedidos',
+            'route'  => 'pedidos.index',
+            'icon' => 'fas fa-table',
+        ],
+        [
+            'text' => 'Mesas',
+            'route'  => 'mesas.index',
+            'icon' => 'fas fa-table',
+            'can' => 'mesas.index'
+        ],
+        [
+            'text' => 'Usuarios',
             'route'  => 'users.index',
             'icon' => 'fas fa-fw fa-users',
             'can' => 'users.index'
         ],
-        [
-            'text' => 'MESAS',
-            'route'  => 'mesas.index',
-            'icon' => 'fas fa-table',
-            'can' => 'mesas.index'
-        ]
     ],
 
     /*

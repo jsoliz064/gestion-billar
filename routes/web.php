@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MesaController;
+use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\userController;
 use Illuminate\Support\Facades\Route;
@@ -41,5 +42,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::group(['prefix' => 'mesas'], function () {
         Route::get('/', [MesaController::class, 'index'])->name('mesas.index');
+    });
+
+    Route::group(['prefix' => 'pedidos'], function () {
+        Route::get('/', [PedidoController::class, 'index'])->name('pedidos.index');
     });
 });

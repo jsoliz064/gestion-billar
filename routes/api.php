@@ -18,27 +18,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::middleware([AuthMiddleware::class])->prefix('clients')->group(function () {
-    Route::get('/exits', [ClienteController::class, 'exits']);
-    Route::post('/', [ClienteController::class, 'create']);
-});
-
-Route::middleware([AuthMiddleware::class])->prefix('productos')->group(function () {
-    Route::get('/', [ProductoController::class, 'getAll']);
-});
 
 Route::middleware([AuthMiddleware::class])->prefix('pedidos')->group(function () {
-    Route::post('/', [PedidoController::class, 'create']);
+    Route::post('terminar/{pedido_id}', [PedidoController::class, 'terminarPedido']);
 });
 
 Route::middleware([AuthMiddleware::class])->prefix('domotica')->group(function () {
     Route::post('/{switch}', [PedidoController::class, 'switch']);
-});
-
-Route::middleware([AuthMiddleware::class])->prefix('map')->group(function () {
-    Route::post('address', [PedidoController::class, 'reverseGeocode']);
 });

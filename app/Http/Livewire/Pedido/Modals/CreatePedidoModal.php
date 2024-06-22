@@ -17,6 +17,7 @@ class CreatePedidoModal extends Component
     public $modalCrear = false;
     public $pedido = [];
     public $mesa;
+    public $error;
 
     public function render()
     {
@@ -31,31 +32,40 @@ class CreatePedidoModal extends Component
 
     public function store()
     {
-        $this->validate([
-            'pedido.horas' => 'nullable|integer|min:1',
-        ]);
-        $this->pedido['fecha_inicio'] = now();
-        $this->pedido['mesa_id'] = $this->mesa->id;
+        try {
+            $this->validate([
+                'pedido.horas' => 'nullable|integer|min:1',
+            ]);
 
-        if (isset($this->pedido['horas'])) {
-            $fecha_inicio = Carbon::parse($this->pedido['fecha_inicio']);
-            $horas = $this->pedido['horas'];
-            $fecha_fin = $fecha_inicio->addHours($horas);
-            $this->pedido['cantidad_horas'] = $horas;
-            $this->pedido['fecha_fin'] = $fecha_fin;
-        }
-
-        $pedido = $this->pedido;
-        $mesa = $this->mesa;
-        DB::transaction(function () use ($pedido, $mesa) {
-            Pedido::create($pedido);
-            $this->switch($mesa, 'on');
-            if (isset($pedido['fecha_fin'])) {
-                $this->scheduleSwitch($mesa, 'off', $pedido['fecha_fin']);
+            if (isset($this->pedido['horas']) && $this->pedido['horas'] == '') {
+                $this->pedido['horas'] = null;
             }
-        });
-        $this->emit('updatePedidoTable');
-        $this->limpiar();
+
+            $this->pedido['fecha_inicio'] = now();
+            $this->pedido['mesa_id'] = $this->mesa->id;
+
+            if (isset($this->pedido['horas'])) {
+                $fecha_inicio = Carbon::parse($this->pedido['fecha_inicio']);
+                $horas = $this->pedido['horas'];
+                $fecha_fin = $fecha_inicio->addHours($horas);
+                $this->pedido['cantidad_horas'] = $horas;
+                $this->pedido['fecha_fin'] = $fecha_fin;
+            }
+
+            $pedido = $this->pedido;
+            $mesa = $this->mesa;
+            DB::transaction(function () use ($pedido, $mesa) {
+                $pedidoDb = Pedido::create($pedido);
+                $this->switch($mesa, 'on');
+                if (isset($pedido['fecha_fin'])) {
+                    $this->scheduleSwitch($mesa, 'off', $pedido['fecha_fin'], $pedidoDb->id);
+                }
+            });
+            $this->emit('updatePedidoTable');
+            $this->limpiar();
+        } catch (\Throwable $th) {
+            $this->error = $th->getMessage();
+        }
     }
 
     public function cancelar()
@@ -68,5 +78,6 @@ class CreatePedidoModal extends Component
         $this->pedido = [];
         $this->mesa = null;
         $this->modalCrear = false;
+        $this->error = null;
     }
 }

@@ -14,7 +14,7 @@ class PedidoDatatable extends DataTableComponent
 
     public function configure(): void
     {
-        $this->setPrimaryKey('id');
+        $this->setPrimaryKey('id')->setDefaultSort('id', 'desc');
     }
 
     public function columns(): array
@@ -23,38 +23,41 @@ class PedidoDatatable extends DataTableComponent
             Column::make("Id", "id")
                 ->sortable()
                 ->searchable(),
-            Column::make("Cliente")
+            Column::make("Mesa")
                 ->label(
                     function ($row, Column $column) {
                         $row->refresh();
-                        $cliente = $row->Cliente;
-                        return $cliente->nombre;
+                        $mesa = $row->Mesa;
+                        return $mesa->nombre;
                     }
                 )
                 ->sortable()
                 ->searchable(),
-            Column::make("Telefono")
-                ->label(
-                    function ($row, Column $column) {
-                        $row->refresh();
-                        $cliente = $row->Cliente;
-                        return $cliente->telefono;
-                    }
-                )
+            Column::make("Fecha de Inicio", "fecha_inicio")
+                ->sortable()
+                ->searchable(),
+            Column::make("Fecha de Fin", "fecha_fin")
+                ->sortable()
+                ->searchable(),
+            Column::make("Cantidad de Hrs", "cantidad_horas")
                 ->sortable()
                 ->searchable(),
             Column::make("Total Bs", "total")
                 ->sortable()
                 ->searchable(),
-            Column::make("Fecha de pedido", "created_at")
-                ->sortable()
-                ->searchable(),
-            Column::make("Fecha de entrega", "fecha_entrega")
-                ->sortable()
-                ->searchable(),
-            Column::make("Estado", "estado")
-                ->sortable()
-                ->searchable(),
+            Column::make("Estado")
+                ->label(
+                    function ($row, Column $column) {
+                        $row->refresh();
+                        $estado = $row->estado;
+                        if ($estado == 'terminado') {
+                            return '<span class="text-success">Terminado</span>';
+                        } else {
+                            return '<span class="text-warning">Pendiente</span>';
+                        }
+                    }
+                )
+                ->html(),
             Column::make('Acciones', 'id')
                 ->format(function ($value, $row, Column $column) {
                     return view('livewire.pedido.pedido-vista-button', [

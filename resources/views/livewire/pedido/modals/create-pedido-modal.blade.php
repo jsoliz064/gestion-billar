@@ -17,10 +17,20 @@
                                 @enderror
                             </div>
 
+                            @if ($error)
+                                <small class="text-danger">{{ $error }}</small>
+                            @endif
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" wire:click="cancelar()">Cancelar</button>
-                            <button type="button" class="btn btn-primary" wire:click="store()">Empezar</button>
+                            <button type="button" class="btn btn-primary" wire:click="store()"
+                                wire:loading.attr='disabled'>Empezar
+                                <div wire:loading class="spinner-border spinner-border-sm" role="status"
+                                    wire:target='store'>
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </button>
                         </div>
                     </div>
                 </div>

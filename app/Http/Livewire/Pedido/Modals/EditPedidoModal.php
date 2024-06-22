@@ -20,6 +20,7 @@ class EditPedidoModal extends Component
     public $pedidoUpdate = [];
     public $email = null;
     public $mesa;
+    public $error;
 
     public function render()
     {
@@ -46,24 +47,30 @@ class EditPedidoModal extends Component
 
     public function terminarPedido()
     {
-        $this->validate([
-            'pedidoUpdate.fecha_fin' => 'required|date',
-            'pedidoUpdate.cantidad_horas' => 'required|numeric|min:0',
-        ]);
+        try {
+            $this->validate([
+                'pedidoUpdate.fecha_fin' => 'required|date',
+                'pedidoUpdate.cantidad_horas' => 'required|numeric|min:0',
+            ]);
 
-        DB::transaction(function () {
-            $pedido = Pedido::find($this->pedido->id);
-            if ($pedido->fecha_fin == null) {
-                $pedido->fecha_fin = new Carbon($this->pedidoUpdate['fecha_fin']);
-                $pedido->cantidad_horas = $this->pedidoUpdate['cantidad_horas'];
-            }
-            $pedido->estado = "terminado";
-            $pedido->save();
-            $this->switch($this->mesa, "off");
-        });
+            DB::transaction(function () {
+                $pedido = Pedido::find($this->pedido->id);
+                if ($pedido->fecha_fin == null) {
+                    $pedido->fecha_fin = new Carbon($this->pedidoUpdate['fecha_fin']);
+                    $pedido->cantidad_horas = $this->pedidoUpdate['cantidad_horas'];
+                }
+                $pedido->estado = "terminado";
+                $total = $pedido->cantidad_horas * $pedido->Mesa->precio;
+                $pedido->total = $total;
+                $pedido->save();
+                $this->switch($this->mesa, "off");
+            });
 
-        $this->emit('updatePedidoTable');
-        $this->limpiar();
+            $this->emit('updatePedidoTable');
+            $this->limpiar();
+        } catch (\Throwable $th) {
+            $this->error = $th->getMessage();
+        }
     }
 
     public function cancelar()
@@ -77,5 +84,6 @@ class EditPedidoModal extends Component
         $this->mesa = null;
         $this->modalEdit = false;
         $this->pedidoUpdate = [];
+        $this->error = null;
     }
 }

@@ -11,7 +11,7 @@
 @stop
 
 @section('content')
-    @livewire('pedido.pedido-lw')
+    @livewire('pedido.pedido-historial-lw')
 @stop
 
 @section('css')
