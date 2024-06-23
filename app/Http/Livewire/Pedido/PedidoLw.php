@@ -13,7 +13,7 @@ class PedidoLw extends Component
 
     public function render()
     {
-        $mesas = Mesa::all();
+        $mesas = Mesa::where('habilitado', true)->get();
         return view('livewire.pedido.pedido-lw', compact('mesas'));
     }
 
@@ -25,6 +25,11 @@ class PedidoLw extends Component
     public function closePedido($mesaId)
     {
         $this->emit('openClosePedidoModal', $mesaId);
+    }
+
+    public function extenderPedido($mesaId)
+    {
+        $this->emit('openExtenderPedidoModal', $mesaId);
     }
 
     public function updatePedidoTable()

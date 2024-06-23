@@ -35,7 +35,7 @@ class EditPedidoModal extends Component
             $fecha_inicio = new Carbon($this->pedido->fecha_inicio);
             $fecha_fin = new Carbon();
             $diferencia_minutos = $fecha_inicio->diffInMinutes($fecha_fin);
-            $diferencia_horas = round($diferencia_minutos / 60, 1);
+            $diferencia_horas = round($diferencia_minutos / 60, 2);
             $this->pedidoUpdate['fecha_fin'] =  $fecha_fin;
             $this->pedidoUpdate['cantidad_horas'] = $diferencia_horas;
         } else {

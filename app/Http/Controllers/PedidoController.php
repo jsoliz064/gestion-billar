@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ExceptionArray;
 use App\Models\Pedido;
-use App\Traits\ResponseTrait;
-use App\Traits\ReverseGeocodeTrait;
 use App\Traits\ServerTrait;
-use App\Traits\ValidateRequestTrait;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 class PedidoController extends Controller
 {
@@ -54,7 +53,7 @@ class PedidoController extends Controller
         }
     }
 
-    public function terminarPedido($pedido_id)
+    public function terminarPedido(Request $request, $pedido_id)
     {
         try {
             $pedido = Pedido::find($pedido_id);
@@ -63,6 +62,17 @@ class PedidoController extends Controller
             }
             if ($pedido->estado == "terminado") {
                 return response()->json(['message' => "Pedido {$pedido_id} ya se encuentra terminado"], 400);
+            }
+
+            $fecha_fin = $request->fecha_fin;
+            if ($fecha_fin == null) {
+                return response()->json(['message' => "fecha fin obligatorio"], 400);
+            }
+
+            $fecha_fin1 = new Carbon($pedido->fecha_fin);
+            $fecha_fin2 = new Carbon($fecha_fin);
+            if ($fecha_fin1->format('Y-m-d H:i:s') !== $fecha_fin2->format('Y-m-d H:i:s')) {
+                return response()->json(['message' => "fecha fin ha sido renovada {$fecha_fin2} a {$fecha_fin1}"], 400);
             }
             $pedido->estado = "terminado";
             $total = $pedido->cantidad_horas * $pedido->Mesa->precio;

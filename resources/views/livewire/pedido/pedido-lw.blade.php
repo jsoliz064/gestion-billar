@@ -6,6 +6,7 @@
     <div>
         @livewire('pedido.modals.create-pedido-modal')
         @livewire('pedido.modals.edit-pedido-modal')
+        @livewire('pedido.modals.extender-pedido-modal')
     </div>
     <div class="row">
         @foreach ($mesas as $mesa)
@@ -58,6 +59,9 @@
                                     @else
                                         Cancelar
                                     @endif
+                                </button>
+                                <button wire:click="extenderPedido('{{ $mesa->id }}')" class="btn btn-success">
+                                    Extender
                                 </button>
                             </div>
                         @endif

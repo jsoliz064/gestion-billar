@@ -32,19 +32,24 @@ class CreatePedidoModal extends Component
 
     public function store()
     {
+        $this->validate([
+            'pedido.horas' => 'nullable|integer|min:1',
+            'pedido.fecha_fin' => [
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) {
+                    if (strtotime($value) <= time()) {
+                        $fail('La fecha y hora deben ser mayores que la fecha y hora actuales.');
+                    }
+                },
+            ],
+        ]);
+
         try {
-            $this->validate([
-                'pedido.horas' => 'nullable|integer|min:1',
-            ]);
-
-            if (isset($this->pedido['horas']) && $this->pedido['horas'] == '') {
-                $this->pedido['horas'] = null;
-            }
-
             $this->pedido['fecha_inicio'] = now();
             $this->pedido['mesa_id'] = $this->mesa->id;
 
-            if (isset($this->pedido['horas'])) {
+            if (isset($this->pedido['horas']) && $this->pedido['horas'] !== '') {
                 $fecha_inicio = Carbon::parse($this->pedido['fecha_inicio']);
                 $horas = $this->pedido['horas'];
                 $fecha_fin = $fecha_inicio->addHours($horas);
@@ -52,13 +57,19 @@ class CreatePedidoModal extends Component
                 $this->pedido['fecha_fin'] = $fecha_fin;
             }
 
-            $pedido = $this->pedido;
-            $mesa = $this->mesa;
-            DB::transaction(function () use ($pedido, $mesa) {
-                $pedidoDb = Pedido::create($pedido);
-                $this->switch($mesa, 'on');
-                if (isset($pedido['fecha_fin'])) {
-                    $this->scheduleSwitch($mesa, 'off', $pedido['fecha_fin'], $pedidoDb->id);
+            if (isset($this->pedido['fecha_fin'])) {
+                $fecha_inicio = new Carbon($this->pedido['fecha_inicio']);
+                $fecha_fin = new Carbon($this->pedido['fecha_fin']);
+                $diferencia_minutos = $fecha_inicio->diffInMinutes($fecha_fin);
+                $diferencia_horas = round($diferencia_minutos / 60, 2);
+                $this->pedido['cantidad_horas'] = $diferencia_horas;
+            }
+
+            DB::transaction(function () {
+                $pedidoDb = Pedido::create($this->pedido);
+                $this->switch($this->mesa, 'on');
+                if (isset($this->pedido['fecha_fin'])) {
+                    $this->scheduleSwitch($this->mesa, 'off', $this->pedido['fecha_fin'], $pedidoDb->id);
                 }
             });
             $this->emit('updatePedidoTable');

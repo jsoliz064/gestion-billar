@@ -26,7 +26,7 @@ trait ServerTrait
     private function sendSwitchRequest(Mesa $mesa, $status, $datetime, $pedido_id = null)
     {
         try {
-            $host_luces = "http://localhost:3000";
+            $host_luces = config('app.HOST_LUCES');
             $client = new Client();
             $device_id = $mesa->device_id;
             $host = $mesa->host;

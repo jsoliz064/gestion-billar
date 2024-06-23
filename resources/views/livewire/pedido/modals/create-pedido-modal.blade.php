@@ -8,12 +8,21 @@
                             <h4 class="modal-title" id="exampleModalLabel">Habilitar {{ $mesa->nombre }}</h4>
                         </div>
                         <div class="modal-body">
+                            <p>Defina el tiempo que se encendera esta mesa, ya sea en horas, por un tiempo especifico o
+                                sin tiempo (ningun valor)</p>
                             <label for="">Horas (opcional): </label>
-                            {{-- <input class="" type="datetime-local" wire:model="pedido.fecha_fin"> --}}
-                            <input class="" type="number" wire:model="pedido.horas">
+                            <input class="" type="number" step="1" wire:model="pedido.horas">
                             <div class="row">
                                 @error('pedido.horas')
-                                    <small class="text-danger">Debe ingresar una cantidad > 0</small>
+                                    <small class="text-danger">solo horas enteras. 1, 2 ,3 ...</small>
+                                @enderror
+                            </div>
+
+                            <label for="">Tiempo (opcional): </label>
+                            <input class="" type="datetime-local" wire:model="pedido.fecha_fin">
+                            <div class="row">
+                                @error('pedido.fecha_fin')
+                                    <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
 

@@ -2,11 +2,13 @@ const express = require("express");
 const axios = require("axios");
 const cron = require("node-cron");
 const app = express();
-const port = 4000;
+require("dotenv").config();
+
+const port = process.env.PORT || 4000;
+const gestion_host = process.env.GESTION_HOST || "http://127.0.0.1:8000";
 
 app.use(express.json());
 
-// Función para enviar la solicitud a la API del Sonoff
 const sendSonoffRequest = async (ip, port, deviceid, outlet, action) => {
     const url = `http://${ip}:${port}/zeroconf/switches`;
     const data = {
@@ -25,17 +27,19 @@ const sendSonoffRequest = async (ip, port, deviceid, outlet, action) => {
     }
 };
 
-const terminarPedido = async (id) => {
-    const url = `http://127.0.0.1:8000/api/pedidos/terminar/${id}`;
+const terminarPedido = async (id, datetime) => {
+    const url = `${gestion_host}/api/pedidos/terminar/${id}`;
     try {
-        const response = await axios.post(url);
+        const response = await axios.post(url, {
+            fecha_fin: datetime,
+        });
+        console.error("terminar pedido:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Error al llamar a la API del Sonoff:", error.message);
+        console.error("Error al terminar pedido", error.response.data);
     }
 };
 
-// Ruta para encender o apagar el interruptor inmediatamente
 app.post("/switch", async (req, res) => {
     const { ip, port, deviceid, outlet, action } = req.body;
 
@@ -51,15 +55,16 @@ app.post("/switch", async (req, res) => {
             outlet,
             action
         );
+        console.log(`switch ${action}, device ${ip}`);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Ruta para programar una acción
 app.post("/schedule-switch", (req, res) => {
-    const { ip, port, deviceid, outlet, action, datetime , pedido_id} = req.body;
+    const { ip, port, deviceid, outlet, action, datetime, pedido_id } =
+        req.body;
 
     if (
         !ip ||
@@ -73,7 +78,8 @@ app.post("/schedule-switch", (req, res) => {
     }
 
     const date = new Date(datetime);
-    console.log(date);
+    console.log(`apagar pedido ${pedido_id},`, date);
+
     if (isNaN(date.getTime())) {
         return res.status(400).json({ error: "Fecha y hora inválidas" });
     }
@@ -86,8 +92,7 @@ app.post("/schedule-switch", (req, res) => {
         cronTime,
         async () => {
             try {
-                await terminarPedido(pedido_id);
-                console.log(`Acción ejecutada: ${action} en ${datetime}`);
+                await terminarPedido(pedido_id, datetime);
             } catch (error) {
                 console.error(
                     "Error al ejecutar la acción programada:",
