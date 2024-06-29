@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Pedido\Modals;
 
 use App\Models\Mesa;
 use App\Models\Pedido;
+use App\Traits\AroundTrait;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use App\Traits\ServerTrait;
@@ -11,7 +12,7 @@ use Carbon\Carbon;
 
 class CreatePedidoModal extends Component
 {
-    use ServerTrait;
+    use ServerTrait, AroundTrait;
     protected $listeners = ['openCreatePedidoModal'];
 
     public $modalCrear = false;
@@ -33,7 +34,7 @@ class CreatePedidoModal extends Component
     public function store()
     {
         $this->validate([
-            'pedido.horas' => 'nullable|integer|min:1',
+            'pedido.cantidad_horas' => 'nullable|integer|min:1',
             'pedido.fecha_fin' => [
                 'nullable',
                 'date',
@@ -46,18 +47,19 @@ class CreatePedidoModal extends Component
         ]);
 
         try {
-            $this->pedido['fecha_inicio'] = now();
+            $this->pedido['fecha_inicio'] = Carbon::now();
             $this->pedido['mesa_id'] = $this->mesa->id;
 
-            if (isset($this->pedido['horas']) && $this->pedido['horas'] !== '') {
-                $fecha_inicio = Carbon::parse($this->pedido['fecha_inicio']);
-                $horas = $this->pedido['horas'];
+            $cantidad_horas = isset($this->pedido['cantidad_horas']) && $this->pedido['cantidad_horas'] !== '';
+
+            if ($cantidad_horas) {
+                $fecha_inicio = $this->pedido['fecha_inicio'];
+                $horas = $this->pedido['cantidad_horas'];
                 $fecha_fin = $fecha_inicio->addHours($horas);
-                $this->pedido['cantidad_horas'] = $horas;
-                $this->pedido['fecha_fin'] = $fecha_fin;
+                $this->pedido['fecha_fin'] = $fecha_fin->format('Y-m-d\TH:i');
             }
 
-            if (isset($this->pedido['fecha_fin'])) {
+            if (!$cantidad_horas && isset($this->pedido['fecha_fin'])) {
                 $fecha_inicio = new Carbon($this->pedido['fecha_inicio']);
                 $fecha_fin = new Carbon($this->pedido['fecha_fin']);
                 $diferencia_minutos = $fecha_inicio->diffInMinutes($fecha_fin);

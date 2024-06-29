@@ -29,18 +29,21 @@
                                     </div>
 
                                     <div class="col-12 my-2">
+                                        <label for="">Precio de la mesa:</label>
+                                        <input type="text" value="{{ $pedido->Mesa->precio }}" readonly="true"
+                                            class="form-control">
+                                    </div>
+
+                                    <div class="col-12 my-2">
                                         <label for="">Total Bs:</label>
-                                        @php
-                                            $total = $pedido->cantidad_horas * $pedido->Mesa->precio;
-                                        @endphp
-                                        <input type="text" value="{{ $total }}" readonly="true"
+                                        <input type="text" value="{{ $pedidoUpdate['total'] }}" readonly="true"
                                             class="form-control">
                                     </div>
                                 @else
                                     <div class="col-12 my-2">
                                         <label for="">Fecha Fin:</label>
                                         <input type="text" value="{{ $pedidoUpdate['fecha_fin'] }}"
-                                            class="form-control">
+                                            class="form-control" readonly="true">
                                         @error('pedidoUpdate.fecha_fin')
                                             <small class="text-danger">campo requerido</small>
                                         @enderror
@@ -49,18 +52,27 @@
                                     <div class="col-12 my-2">
                                         <label for="">Cant. Horas</label>
                                         <input type="text" value="{{ $pedidoUpdate['cantidad_horas'] }}"
-                                            class="form-control">
+                                            class="form-control" readonly="true">
                                         @error('pedidoUpdate.cantidad_horas')
                                             <small class="text-danger">campo requerido</small>
                                         @enderror
                                     </div>
 
                                     <div class="col-12 my-2">
+                                        <label for="">Cant. Horas Redondeado</label>
+                                        <input type="text" value="{{ $pedidoUpdate['cantidad_horas_around'] }}"
+                                            class="form-control" readonly="true">
+                                    </div>
+
+                                    <div class="col-12 my-2">
+                                        <label for="">Precio de la mesa:</label>
+                                        <input type="text" value="{{ $pedido->Mesa->precio }}" readonly="true"
+                                            class="form-control">
+                                    </div>
+
+                                    <div class="col-12 my-2">
                                         <label for="">Total Bs:</label>
-                                        @php
-                                            $total = $pedidoUpdate['cantidad_horas'] * $pedido->Mesa->precio;
-                                        @endphp
-                                        <input type="text" value="{{ $total }}" readonly="true"
+                                        <input type="text" value="{{ $pedidoUpdate['total'] }}" readonly="true"
                                             class="form-control">
                                     </div>
                                 @endif

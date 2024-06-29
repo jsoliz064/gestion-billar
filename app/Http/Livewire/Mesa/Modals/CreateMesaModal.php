@@ -27,7 +27,7 @@ class CreateMesaModal extends Component
         $this->validate([
             'mesa.nombre' => 'required|string|max:255',
             'mesa.host' => 'nullable|string|max:255',
-            'mesa.precio' => 'required|number',
+            'mesa.precio' => 'required|numeric',
             'mesa.habilitado' => 'nullable|boolean',
         ]);
 

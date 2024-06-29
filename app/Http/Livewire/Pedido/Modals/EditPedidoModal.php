@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Pedido\Modals;
 
 use App\Models\Mesa;
 use App\Models\Pedido;
+use App\Traits\AroundTrait;
 use App\Traits\ServerTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ use Livewire\Component;
 
 class EditPedidoModal extends Component
 {
-    use ServerTrait;
+    use ServerTrait, AroundTrait;
     protected $listeners = ['openClosePedidoModal'];
 
     public $modalEdit = false;
@@ -42,6 +43,9 @@ class EditPedidoModal extends Component
             $this->pedidoUpdate['fecha_fin'] =  $this->pedido->fecha_fin;
             $this->pedidoUpdate['cantidad_horas'] = $this->pedido->cantidad_horas;
         }
+        $cantidad_horas = $this->around($this->pedidoUpdate['cantidad_horas']);
+        $this->pedidoUpdate['cantidad_horas_around'] = $cantidad_horas;
+        $this->pedidoUpdate['total'] = $cantidad_horas * $this->pedido->Mesa->precio;
         $this->modalEdit = true;
     }
 

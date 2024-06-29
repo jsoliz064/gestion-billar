@@ -61,8 +61,8 @@ class MesaDatatable extends DataTableComponent
                         if ($row->habilitado) {
                             return
                                 "
-                                <button class='btn btn-outline-success btn-sm' wire:click='on($row)'>Encender</button> 
-                                <button class='btn btn-outline-secondary btn-sm' wire:click='off($row)'>Apagar</button>
+                                <button class='btn btn-outline-success btn-sm' wire:click='on($row)' wire:loading.attr='disabled'>Encender</button> 
+                                <button class='btn btn-outline-secondary btn-sm' wire:click='off($row)' wire:loading.attr='disabled'>Apagar</button>
                                 ";
                         } else {
                             return '<span class="text-danger">Deshabilitado</span>';

@@ -60,9 +60,11 @@
                                         Cancelar
                                     @endif
                                 </button>
-                                <button wire:click="extenderPedido('{{ $mesa->id }}')" class="btn btn-success">
-                                    Extender
-                                </button>
+                                @if ($pedido->fecha_fin !== null)
+                                    <button wire:click="extenderPedido('{{ $mesa->id }}')" class="btn btn-success">
+                                        Extender
+                                    </button>
+                                @endif
                             </div>
                         @endif
 

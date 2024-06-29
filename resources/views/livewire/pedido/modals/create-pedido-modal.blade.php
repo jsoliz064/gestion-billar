@@ -11,9 +11,9 @@
                             <p>Defina el tiempo que se encendera esta mesa, ya sea en horas, por un tiempo especifico o
                                 sin tiempo (ningun valor)</p>
                             <label for="">Horas (opcional): </label>
-                            <input class="" type="number" step="1" wire:model="pedido.horas">
+                            <input class="" type="number" step="1" wire:model="pedido.cantidad_horas">
                             <div class="row">
-                                @error('pedido.horas')
+                                @error('pedido.cantidad_horas')
                                     <small class="text-danger">solo horas enteras. 1, 2 ,3 ...</small>
                                 @enderror
                             </div>
