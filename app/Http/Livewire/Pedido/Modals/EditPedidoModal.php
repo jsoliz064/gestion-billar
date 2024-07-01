@@ -67,7 +67,7 @@ class EditPedidoModal extends Component
                 $total = $pedido->cantidad_horas * $pedido->Mesa->precio;
                 $pedido->total = $total;
                 $pedido->save();
-                $this->switch($this->mesa, "off");
+                // $this->switch($this->mesa, "off");
             });
 
             $this->emit('updatePedidoTable');

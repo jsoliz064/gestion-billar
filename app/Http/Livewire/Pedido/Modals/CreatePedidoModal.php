@@ -49,11 +49,9 @@ class CreatePedidoModal extends Component
         try {
             $this->pedido['fecha_inicio'] = Carbon::now();
             $this->pedido['mesa_id'] = $this->mesa->id;
-
             $cantidad_horas = isset($this->pedido['cantidad_horas']) && $this->pedido['cantidad_horas'] !== '';
-
             if ($cantidad_horas) {
-                $fecha_inicio = $this->pedido['fecha_inicio'];
+                $fecha_inicio = new Carbon($this->pedido['fecha_inicio']);
                 $horas = $this->pedido['cantidad_horas'];
                 $fecha_fin = $fecha_inicio->addHours($horas);
                 $this->pedido['fecha_fin'] = $fecha_fin->format('Y-m-d\TH:i');
